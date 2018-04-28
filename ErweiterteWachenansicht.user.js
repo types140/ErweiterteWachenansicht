@@ -188,7 +188,7 @@ $(function() {
         });
     }
 
-    const checkFMS = true; // auf true setzen um FMS 6 zu ignorieren
+    const checkFMS = false; // auf true setzen um FMS 6 zu ignorieren
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== "Besitzer:") {
