@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1
+// @version      1.0.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -94,7 +94,7 @@ $(function() {
                               { id: 82, name: "MEK - MTF", personal: 9 }];
 
     function getPersonalAnzahl(getCheckFMS) {
-        let setEinfuegepunkt = $("dl > dd:nth-child(6) > div");
+        let setEinfuegepunkt = "";
         let getFahrzeugTypId = -1;
         let getPersonalBenoetigt = 0;
 
@@ -125,9 +125,12 @@ $(function() {
             });
         });
 
-        // wenn nth-child = 6 ist hat das Gebaeude eine Stufe
-        // wenn nicht wird nth-child = 4 genutzt (THW z.B.)
-        if(setEinfuegepunkt.length == 0) setEinfuegepunkt = $("dl > dd:nth-child(4) > div");
+        // nth-child = 4 => THW, SEG
+        // nth-child = 6 => Feuerwache, Rettungswache, Bereitschaftspolizei, Polizeisondereinheiten
+        // nth-child = 8 => Rettungshubschrauberstation, Polizeihubschrauberstation, Wasserrettungswache
+        if($("dl > dt:nth-child(3)").text() == "Personal:") setEinfuegepunkt = $("dl > dd:nth-child(4) > div");
+        else if($("dl > dt:nth-child(5)").text() == "Personal:") setEinfuegepunkt = $("dl > dd:nth-child(6) > div");
+        else setEinfuegepunkt = $("dl > dd:nth-child(8) > div");
 
         // orientiert sich am div innerhalb des dd-Tags, daher before
         setEinfuegepunkt.before("(" + getPersonalBenoetigt + " benötigt) ");
@@ -192,8 +195,8 @@ $(function() {
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== "Besitzer:") {
+        getPersonalAnzahl(checkFMS);
         getAusbauDaten();
         setFMS();
-        getPersonalAnzahl(checkFMS);
     }
 });
