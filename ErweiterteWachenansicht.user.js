@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.0.1
+// @version      1.0.2
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -184,12 +184,22 @@ $(function() {
         $("span").click(function(){
             // Wenn das Fahrzeug im Status 2 ist erhaelt es den Link fuer Status 6, und andersrum
             // Gleichzeitig wird die Fahrzeug-ID aus dem neu eingefuegten <span>-Tag ausgelesen
-            if($(this).hasClass("building_list_fms_2")) $.get(setLink + $(this).attr("vehicle_id") + "/set_fms/6");
-            else if($(this).hasClass("building_list_fms_6")) $.get(setLink + $(this).attr("vehicle_id") + "/set_fms/2");
-
-            // 0,25 Sekunden wird auf den Reload gewartet, da die Seite den Statuswechsel sonst nicht mitbekommt
-            setTimeout( function() { location.reload(); }, 250);
+            // Am Ende wird die Seite neu geladen
+            if($(this).hasClass("building_list_fms_2")) {
+                $(this).attr("style", "cursor: pointer");
+                $.get(setLink + $(this).attr("vehicle_id") + "/set_fms/6");
+                warteAufReload();
+            } else if($(this).hasClass("building_list_fms_6")) {
+                $(this).attr("style", "cursor: pointer");
+                $.get(setLink + $(this).attr("vehicle_id") + "/set_fms/2");
+                warteAufReload();
+            }
         });
+    }
+
+    function warteAufReload() {
+        // 0,25 Sekunden wird auf den Reload gewartet, da die Seite den Statuswechsel sonst nicht mitbekommt
+        setTimeout( function() { location.reload(); }, 250);
     }
 
     const checkFMS = false; // auf true setzen um FMS 6 zu ignorieren
