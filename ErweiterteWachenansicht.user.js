@@ -127,7 +127,8 @@ $(function() {
 
         // nth-child = 4 => THW, SEG
         // nth-child = 6 => Feuerwache, Rettungswache, Bereitschaftspolizei, Polizeisondereinheiten
-        // nth-child = 8 => Rettungshubschrauberstation, Polizeihubschrauberstation, Wasserrettungswache
+        // nth-child = 8 => Rettungshubschrauberstation, Polizeihubschrauberstation,
+        //                  Wasserrettungswache, Feuerwache mit Abrollbehaeltern
         if($("dl > dt:nth-child(3)").text() == "Personal:") setEinfuegepunkt = $("dl > dd:nth-child(4) > div");
         else if($("dl > dt:nth-child(5)").text() == "Personal:") setEinfuegepunkt = $("dl > dd:nth-child(6) > div");
         else setEinfuegepunkt = $("dl > dd:nth-child(8) > div");
