@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         Erweiterte Wachenansicht
-// @version      1.0.2
+// @name         Erweiterte Wachenansicht_DEV
+// @version      1.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -93,14 +93,18 @@ $(function() {
                               { id: 81, name: "MEK - ZF", personal: 4 },
                               { id: 82, name: "MEK - MTF", personal: 9 }];
 
-    function getPersonalAnzahl(getCheckFMS) {
+    function getPersonalAnzahl(getIgnoriereCheckFMS) {
         let setEinfuegepunkt = "";
         let getFahrzeugTypId = -1;
         let getPersonalBenoetigt = 0;
 
         $("#vehicle_table > tbody > tr").each(function() {
+            // wenn FMS NICHT geprueft werden soll zaehle das Personal von allen
+            // Fahrzeugen
+            if(getIgnoriereCheckFMS) {
+                getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
             // wenn FMS geprueft werden soll ...
-            if(getCheckFMS) {
+            } else {
                 // ... und FMS Status 6 gesetzt ist ignoriere das Personal
                 if($(this).find("span").hasClass("building_list_fms_6")){
                     getFahrzeugTypId = -1;
@@ -108,10 +112,6 @@ $(function() {
                 } else {
                     getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
                 }
-            // wenn FMS NICHT geprueft werden soll zaehle das Personal von allen
-            // Fahrzeugen
-            } else {
-                getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
             }
 
             // pruefe ob aktuelle FahrzeugTypId mit einer ID aus der Fahrzeugliste
@@ -202,12 +202,57 @@ $(function() {
         setTimeout( function() { location.reload(); }, 250);
     }
 
-    const checkFMS = false; // auf true setzen um FMS 6 zu ignorieren
+    function setEditButton(getNurNeueFahrzeugnamen) {
+        let getFahrzeugId = "";
+        let getFahrzeugName = "";
+        let getIstInArray = "";
+
+        $("#vehicle_table > tbody > tr").each(function() {
+            getFahrzeugId = $(this).find("a").attr("href").replace("/vehicles/", "");
+            getFahrzeugName = $(this).find("a").first().text();
+            // Wenn der gefundene Fahrzeugname sich in der Liste befindet ist er Standart,
+            // wenn nicht wird undefined zurueckgegeben
+            getIstInArray = $.grep(arrFahrzeugDaten, function(n) { return n.name == getFahrzeugName; })[0];
+
+            // Wenn getNurNeueFahrzeugnamen === true muss geprueft werden ob es sich bei dem
+            // Fahrzeugnamen noch um einen Standartnamen handelt
+            if(getNurNeueFahrzeugnamen) {
+                // wenn getIstInArray undefined ist wurde der Fahrzeugname nicht in der Liste gefunden
+                // damit der Name bereits editiert worden und der Button wird nicht angezeigt
+                if(getIstInArray == undefined) return true;
+                $(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+            } else {
+                $(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+            }
+        });
+    }
+
+    function setPersonalButton() {
+        let getFahrzeugId = "";
+        $("#vehicle_table > tbody > tr").each(function() {
+            getFahrzeugId = $(this).find("a").attr("href").replace("/vehicles/", "");
+            // Fuege den Button "Personalzuweisung" hinter die max. Personalzahl jedes Fahrzeugs
+            $(this).find("td").last().append("<a href='/vehicles/" + getFahrzeugId + "/zuweisung' class='btn btn-default btn-xs'>Personalzuweisung</a>");
+        });
+    }
+
+    function setEinsatzAusblenden() {
+        $("#vehicle_table >> tr").each(function() {
+            // Entferne vollstaendig die 4. Spalte der Tabelle = aktuelle Einsaetze
+            $(":nth-child(4)", this).remove();
+        });
+    }
+
+    const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
+    const nurNeueFahrzeugnamen = true; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== "Besitzer:") {
-        getPersonalAnzahl(checkFMS);
+        getPersonalAnzahl(ignoriereFMS);
         getAusbauDaten();
         setFMS();
+        setEditButton(nurNeueFahrzeugnamen);
+        setPersonalButton();
+        setEinsatzAusblenden();
     }
 });
