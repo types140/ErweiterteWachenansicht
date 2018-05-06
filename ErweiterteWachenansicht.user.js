@@ -231,8 +231,8 @@ $(function() {
         let getFahrzeugId = "";
         $("#vehicle_table > tbody > tr").each(function() {
             getFahrzeugId = $(this).find("a").attr("href").replace("/vehicles/", "");
-            // Fuege den Button "Personalzuweisung" hinter die max. Personalzahl jedes Fahrzeugs
-            $(this).find("td").last().append("<a href='/vehicles/" + getFahrzeugId + "/zuweisung' class='btn btn-default btn-xs'>Personalzuweisung</a>");
+            // Fuege den Button "Personalzuweisung" hinter die max. Personalzahl jedes Fahrzeugs hinzu
+            if($(this).find("td").last().text().trim() !== "0") $(this).find("td").last().append("<a href='/vehicles/" + getFahrzeugId + "/zuweisung' class='btn btn-default btn-xs'>Personalzuweisung</a>");
         });
     }
 
