@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Erweiterte Wachenansicht_DEV
+// @name         Erweiterte Wachenansicht
 // @version      1.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
