@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.1
+// @version      1.1.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -220,9 +220,9 @@ $(function() {
                 // wenn getIstInArray undefined ist wurde der Fahrzeugname nicht in der Liste gefunden
                 // damit der Name bereits editiert worden und der Button wird nicht angezeigt
                 if(getIstInArray == undefined) return true;
-                $(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                $(this).find("a").first().append("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
             } else {
-                $(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                $(this).find("a").first().append("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
             }
         });
     }
