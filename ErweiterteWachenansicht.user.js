@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.1.1
+// @version      1.2
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -210,7 +210,7 @@ $(function() {
         $("#vehicle_table > tbody > tr").each(function() {
             getFahrzeugId = $(this).find("a").attr("href").replace("/vehicles/", "");
             getFahrzeugName = $(this).find("a").first().text();
-            // Wenn der gefundene Fahrzeugname sich in der Liste befindet ist er Standart,
+            // Wenn sich der gefundene Fahrzeugname in der Liste befindet ist er Standart,
             // wenn nicht wird undefined zurueckgegeben
             getIstInArray = $.grep(arrFahrzeugDaten, function(n) { return n.name == getFahrzeugName; })[0];
 
@@ -220,9 +220,11 @@ $(function() {
                 // wenn getIstInArray undefined ist wurde der Fahrzeugname nicht in der Liste gefunden
                 // damit der Name bereits editiert worden und der Button wird nicht angezeigt
                 if(getIstInArray == undefined) return true;
-                $(this).find("a").first().append("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                //$(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                $("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>").appendTo($(this).find("a").first());
             } else {
-                $(this).find("a").first().append("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                //$(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
+                $("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>").appendTo($(this).find("a").first());
             }
         });
     }
@@ -243,8 +245,38 @@ $(function() {
         });
     }
 
+    function setAktuellMaxPersonal() {
+        // Muss vor setPersonalButton() stehen da sonst der Inhalt des Buttons ebenfalls manipuliert wird
+        let getAktuelleBesatzung = "";
+        let getFahrzeugTypId = "";
+        let getFahrzeugpersonal = "";
+
+        // Bearbeite die Spaltenuebersicht zur besseren Orientierung/Erklaerung
+        if($("th[data-column='4']").text() == "Besatzung (Maximal)") $("th[data-column='4']").text("Besatzung (Aktuell / Maximal)");
+
+        $("#vehicle_table > tbody > tr").each(function() {
+            // Finde FahrzeugId des aktuellen Fahrzeuges
+            getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
+
+            // Durchlaufe das Fahrzeug-Array nach der FahrzeugId und finde die maximale Besatzungsstärke
+            $.each(arrFahrzeugDaten, function(keyFahrzeugdaten, valFahrzeugdaten) {
+                if(getFahrzeugTypId == valFahrzeugdaten.id) {
+                    getFahrzeugpersonal = valFahrzeugdaten.personal;
+                    return false;
+                }
+            });
+
+            // Finde die aktuelle Besatzung ...
+            getAktuelleBesatzung = $(this).find("td").last().text().trim();
+            $(this).find("td").last().text(function() {
+                // ... und ersetze den gesamten Text durch Aktuellebesatzung / MaximalBesatzung
+                return $(this).text().replace(getAktuelleBesatzung, getAktuelleBesatzung + " / " + getFahrzeugpersonal);
+            });
+        });
+    }
+
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
-    const nurNeueFahrzeugnamen = true; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
+    const nurNeueFahrzeugnamen = false; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== "Besitzer:") {
@@ -252,6 +284,7 @@ $(function() {
         getAusbauDaten();
         setFMS();
         setEditButton(nurNeueFahrzeugnamen);
+        setAktuellMaxPersonal();
         setPersonalButton();
         setEinsatzAusblenden();
     }
