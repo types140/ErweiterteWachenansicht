@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.2
+// @version      1.2.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -72,7 +72,7 @@ $(function() {
                               { id: 60, name: "GW-SAN", personal: 6 },
                               { id: 61, name: "Polizeihubschrauber", personal: 3 },
                               { id: 62, name: "AB-Schlauch", personal: 0 },
-                              { id: 63, name: "GW-Taucher", personal: 6 },
+                              { id: 63, name: "GW-Taucher", personal: 2 },
                               { id: 64, name: "GW-Wasserrettung", personal: 6 },
                               { id: 65, name: "LKW 7 Lkr 19 tm", personal: 2 },
                               { id: 66, name: "Anh MzB", personal: 0 },
