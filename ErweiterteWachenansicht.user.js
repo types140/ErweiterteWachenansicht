@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.2.1
+// @version      1.2.2
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @exclude      *://www.leitstellenspiel.de/buildings/*/personals
@@ -91,7 +91,11 @@ $(function() {
                               { id: 79, name: "SEK - ZF", personal: 4 },
                               { id: 80, name: "SEK - MTF", personal: 9 },
                               { id: 81, name: "MEK - ZF", personal: 4 },
-                              { id: 82, name: "MEK - MTF", personal: 9 }];
+                              { id: 82, name: "MEK - MTF", personal: 9 },
+                              { id: 83, name: "GW-Werkfeuerwehr", personal: 9 },
+                              { id: 84, name: "ULF mit Löscharm", personal: 3 },
+                              { id: 85, name: "TM 50", personal: 3 },
+                              { id: 86, name: "Turbolöscher", personal: 3 }];
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
         let setEinfuegepunkt = "";
