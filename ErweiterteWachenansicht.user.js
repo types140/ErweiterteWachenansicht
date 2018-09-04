@@ -1,9 +1,8 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.2.2
+// @version      1.3.0
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
-// @exclude      *://www.leitstellenspiel.de/buildings/*/personals
 // @grant        none
 // ==/UserScript==
 /* global $ */
@@ -145,6 +144,7 @@ $(function() {
         let setTextKeinAusbau = "derzeit nicht"; // Text wenn kein Ausbau stattfindet
         let getAusbauzeit = "";
         let getAusbauname = "";
+        let getIdName = "";
 
         // Gebaeude ohne Ausbaumoeglichkeit ausschliessen
         if($("#ausbauten").length == 0) return false;
@@ -153,6 +153,9 @@ $(function() {
 
             // getAusbauname wird mit jedem Durchgang neu gesetzt
             getAusbauname = $(this).find("b").text() + "<br/>";
+
+            // Suche nach der ID welche die laufende Zeit ermoeglicht
+            getIdName = $(this).find("span").attr("id");
 
             // Erst wenn der entsprechende <span>-Tag gefunden wurde ...
             getAusbauzeit = $(this).find("span[id^='extension_countdown_']").text();
@@ -165,7 +168,7 @@ $(function() {
         // Wurde kein Ausbau in Arbeit gefunden wird nur ein selbstdefinierter Text ausgegeben
         if(!getAusbauzeit) getAusbauzeit = setTextKeinAusbau;
 
-        $("dl").first().append("<dt><strong>Ausbau:</strong></dt><dd>" + getAusbauname + getAusbauzeit + "</dd>");
+        $("dl").first().append("<dt><strong>Ausbau:</strong></dt><dd>" + getAusbauname + "<span id='" + getIdName + "'>" + getAusbauzeit + "</span></dd>");
     }
 
     function setFMS() {
@@ -222,7 +225,7 @@ $(function() {
             // Fahrzeugnamen noch um einen Standartnamen handelt
             if(getNurNeueFahrzeugnamen) {
                 // wenn getIstInArray undefined ist wurde der Fahrzeugname nicht in der Liste gefunden
-                // damit der Name bereits editiert worden und der Button wird nicht angezeigt
+                // damit ist der Name bereits editiert worden und der Button wird nicht angezeigt
                 if(getIstInArray == undefined) return true;
                 //$(this).find("a").first().after("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>");
                 $("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='Bearbeiten' class='glyphicon glyphicon-pencil'></span></a>").appendTo($(this).find("a").first());
@@ -277,6 +280,115 @@ $(function() {
                 return $(this).text().replace(getAktuelleBesatzung, getAktuelleBesatzung + " / " + getFahrzeugpersonal);
             });
         });
+}
+
+    function getPersonalAusbildung(){
+        let arrPersonalAusbildung = [];
+        let getIstInArray = "";
+        let getAusbildung = "";
+        let getFahrzeug = "";
+        let getVerfuegbarkeit = "";
+        let found = false;
+        let output = "";
+        let getPersonalOhneFahrzeug = 0;
+        let getPersonalInAusbildung = 0;
+
+        $("#personal_table > tbody > tr").each(function() {
+            // TODO: wenn im Unterricht dann auch val.count erhöhen sodass als ausgebildetes Personal gezählt wird
+            found = false;
+            getPersonalOhneFahrzeug = 0;
+            getPersonalInAusbildung = 0;
+
+            // filtert die Ausbildungen der aktuellen Person
+            getAusbildung = $("td:nth-child(2)", this).text().trim(" ");
+
+            // filtert die Zuweisung der aktuellen Person zu einem Fahrzeug
+            getFahrzeug = $("td:nth-child(3)", this).text().trim(" ");
+
+            // filtert die Verfuegbarkeit der aktuellen Person
+            getVerfuegbarkeit = $("td:nth-child(4)", this).text().trim(" ").replace("Im Unterricht: ", "").replace(" Lehrgang", "");
+
+            // wenn sich die Person auf einem Einsatz befindet muss sie den Status Verfügbar erhalten - anders kann es sonst nicht
+            // ausgewertet werden
+            if (getVerfuegbarkeit.indexOf("Fahrzeug") != -1) getVerfuegbarkeit = "Verfügbar";
+
+            // Nur bei GW-Hoehenrettung: ist die Person ausgebildet ist es GW-Höhenrettung, im Lehrgang heißt es nur Höhenrettung
+            if(getVerfuegbarkeit == "Höhenrettung") getVerfuegbarkeit = "GW-" + getVerfuegbarkeit;
+
+            // ist die aktuelle Person keinem Fahrzeug zugewiesen ist es ohne Fahrzeug ...
+            if(!getFahrzeug) getPersonalOhneFahrzeug = 1;
+
+            // wenn die aktuelle Person bereits eine Ausbildung hat und sich in einem Lehrgang befindet muessen mehrere
+            // Lehrgaenge aneinander gekettet werden
+            if(getAusbildung && getVerfuegbarkeit != "Verfügbar") {
+                getAusbildung += ", " + getVerfuegbarkeit;
+                getPersonalInAusbildung++; // ... und die Zahl der Personen in Ausbildung wird um 1 erhoeht
+            // besitzt die aktuelle Person keine Ausbildung, befindet sich aber im Lehrgang, wird dieser als erste Ausbildung gewertet
+            } else if(!getAusbildung && getVerfuegbarkeit != "Verfügbar") {
+                getAusbildung = getVerfuegbarkeit;
+                getPersonalInAusbildung++;// ... und die Zahl der Personen in Ausbildung wird um 1 erhoeht
+            // besitzt die aktuelle Person weder eine Ausbildung, noch ist sie in einem Lehrgang, wird der Status auf "ohne Ausbildung" gesetzt
+            } else if(!getAusbildung && getVerfuegbarkeit == "Verfügbar") {
+                getAusbildung = "ohne Ausbildung";
+            }
+
+            // das if wird nur bei der ersten auszuwertenden Person genutzt, andernfalls ...
+            if(arrPersonalAusbildung.length == 0) arrPersonalAusbildung.push({name:getAusbildung, count:1, withoutcar:getPersonalOhneFahrzeug, inschool:getPersonalInAusbildung});
+
+            // ... beginnt die Auswertung des Arrays
+            else {
+                $.each(arrPersonalAusbildung, function(key, val) {
+                    // wenn sich die Ausbildung der aktuellen Person im Array befindet ...
+                    if(val.name == getAusbildung) {
+                        // ... und sich in keinem Fahrzeug befindet, erhoehe "ohne Fahrzeug" um eins
+                        if(!getFahrzeug) val.withoutcar++;
+
+                        // ... und sich in einem Lehrgang befindet, erhoehe "in Ausbildung" um eins
+                        if(getVerfuegbarkeit != "Verfügbar") val.inschool++;
+
+                        // ... erhoehe die insgesamt zu zaehlenden Personen um eins
+                        val.count++;
+
+                        // ... und markiere als gefunden
+                        found = true;
+                        return false;
+                    }
+                });
+
+                // wurde die Ausbildung der aktuellen Person nicht im Array gefunden muss es hinzugefuegt werden
+                if(found == false) arrPersonalAusbildung.push({name:getAusbildung, count:1, withoutcar:getPersonalOhneFahrzeug, inschool:getPersonalInAusbildung});
+            }
+        });
+
+        // Ausgabe: durchlaufe das gesamte Array
+        $.each(arrPersonalAusbildung, function(key, val){
+            output += "<tr style='border-bottom: 1px solid #DCDCDC'>";
+            output += "<td style='text-align:right'>" + val.count + "x&nbsp;</td>";
+            output += "<td style='text-align:center'>" + val.name + " </td>";
+            output += "<td style='text-align:right'>&nbsp;(";
+
+            // Ist die aktuelle Person einem Fahrzeug zugewiesen oder befindet sich im Lehrgang?
+            if(val.withoutcar > 0 || val.inschool > 0){
+                // ... pruefe ob es einem Fahrzeug zugewiesen ist und sich in einer Ausbildung befindet
+                if(val.withoutcar > 0 && val.inschool > 0) output += val.withoutcar + " ohne Fahrzeug, " + val.inschool + " in Ausbildung";
+
+                // ... pruefe ob es einem Fahrzeug zugewiesen ist (im Lehrgang ist sie nicht)
+                else if(val.withoutcar > 0) output += val.withoutcar + " ohne Fahrzeug";
+
+                // ... ansonsten befinden sich alle Personen mit gleichem Lehrgang in Fahrzeugen, einige koennen aber auf Lehrgang sein
+                else output += "alle zugewiesen, " + val.inschool + " in Ausbildung";
+
+            // Alle auszuwertenden Personen mit gleichem Lehrgang und ohne Ausbildung wurden Fahrzeugen zugewiesen
+            } else {
+                output += "alle zugewiesen";
+            }
+
+            output += ")</td>";
+            output += "</tr>";
+        });
+
+        // Fuege dem "Header" der Personenuebersichtsseite hinzu
+        if($("dl > dt:nth-child(1)").text() == "WacheAnzahl") $("dl").last().append("<dt><strong>Ausbildung:</strong></dt><dd><table>" + output + "</table></dd>");
     }
 
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
@@ -291,5 +403,6 @@ $(function() {
         setAktuellMaxPersonal();
         setPersonalButton();
         setEinsatzAusblenden();
+        getPersonalAusbildung();
     }
 });
