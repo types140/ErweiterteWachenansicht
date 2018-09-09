@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht DEV
-// @version      1.4.0
+// @version      1.5.0
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
+// @include      *://www.meldkamerspel.com/buildings/*
 // @grant        none
 // ==/UserScript==
 /* global $ */
@@ -125,26 +126,59 @@ $(function() {
                                 { id: 25, name: "Large Rescue Boat", personal: 0},
                                 { id: 26, name: "SWAT SUV", personal: 6}];
 
+    const arrFahrzeugDatenNL = [{ id: 0, name: "SIV | Snel Interventie Voertuig", personal: 2},
+                                { id: 1, name: "TS 8/9 | Tankautospuit (8/9 personen)", personal: 9},
+                                { id: 2, name: "AL | Autoladder", personal: 3},
+                                { id: 3, name: "DA-OvD-B | Officier van Dienst - Brandweer", personal: 1},
+                                { id: 4, name: "HV-G | Hulpverleningsvoertuig Groot", personal: 3},
+                                { id: 5, name: "AB | Adembeschermingsvoertuig", personal: 3},
+                                { id: 6, name: "TST 8/9 | Tankautospuit Terreinvaardig (8/9 personen)", personal: 9},
+                                { id: 7, name: "TST 6/7 | Tankautospuit Terreinvaardig (6/7 personen)", personal: 7},
+                                { id: 8, name: "TST 4 | Tankautospuit Terreinvaardig (4 personen)", personal: 4},
+                                { id: 9, name: "TS 4 | Tankautospuit (4 personen)", personal: 4},
+                                { id: 10, name: "SL | Slangenwagen", personal: 3},
+                                { id: 11, name: "WVD | Waarschuwings- en Verkenningsdienst", personal: 4},
+                                { id: 12, name: "TST-NBB 8/9 | Tankautospuit Natuurbrandbestrijding (8/9 personen)", personal: 9},
+                                { id: 13, name: "TS8 (4x4)", personal: 0},
+                                { id: 14, name: "TST-NBB 6/7 | Tankautospuit Natuurbrandbestrijding (6/7 personen)", personal: 7},
+                                { id: 15, name: "TST-NBB 4 | Tankautospuit Natuurbrandbestrijding (4 personen)", personal: 4},
+                                { id: 16, name: "Ambulance", personal: 2},
+                                { id: 17, name: "TS 6/7 | Tankautospuit (6/7 personen)", personal: 7},
+                                { id: 18, name: "HW | Hoogwerker", personal: 3},
+                                { id: 19, name: "DA-HOvD-B | Hoofd-Officier van Dienst - Brandweer", personal: 1},
+                                { id: 20, name: "DA | Dienstauto (4 personen)", personal: 4},
+                                { id: 21, name: "DB | Dienstbus (9 personen)", personal: 0},
+                                { id: 22, name: "DA Noodhulp | Dienstauto Noodhulp", personal: 2},
+                                { id: 23, name: "Lifeliner", personal: 4},
+                                { id: 24, name: "AGS | Adviseur Gevaarlijke Stoffen", personal: 2},
+                                { id: 25, name: "DB Noodhulp | Dienstbus Noodhulp", personal: 2},
+                                { id: 26, name: "HA | Haakarmvoertuig", personal: 3},
+                                { id: 27, name: "ABH | Adembeschermingshaakarmbak", personal: 0},
+                                { id: 28, name: "Politiehelikopter", personal: 3},
+                                { id: 29, name: "WTH | Watertransporthaakarmbak", personal: 0},
+                                { id: 30, name: "Zorgambulance | B-ambulance", personal: 2},
+                                { id: 31, name: "CO | Commandovoertuig", personal: 3},
+                                { id: 32, name: "COH | Commandohaakarmbak", personal: 0},
+                                { id: 33, name: "WO | Waterongevallenvoertuig", personal: 6},
+                                { id: 34, name: "TW | Tankwagen", personal: 3},
+                                { id: 35, name: "OvD-P | Officier van Dienst - Politie", personal: 1},
+                                { id: 36, name: "WOA | Waterongevallenaanhanger", personal: 0},
+                                { id: 37, name: "MMT-Auto", personal: 4},
+                                { id: 38, name: "OvD-G | Officier van Dienst - Geneeskunde", personal: 1},
+                                { id: 39, name: "ME Commandovoertuig | Mobiele Eenheid - Commandovoertuig", personal: 4},
+                                { id: 40, name: "ME Groepsvoertuig | Mobiele Eenheid - Groepsvoertuig", personal: 2},
+                                { id: 41, name: "CT (8x8) | Crashtender (8x8)", personal: 0},
+                                { id: 42, name: "CT (6x6) | Crashtender (6x6)", personal: 0},
+                                { id: 43, name: "CT (4x4) | Crashtender (4x4)", personal: 0},
+                                { id: 44, name: "AFO/OSC | Airport Fire Officer / On Scene Commander", personal: 0},
+                                { id: 45, name: "DBH | Dompelpomphaakarmbak", personal: 0},
+                                { id: 46, name: "DM Noddhulp | Dienstmotorfiets Noodhulp", personal: 2},
+                                { id: 47, name: "DA Hondengeleider | Dienstauto Hondengeleider", personal: 2},
+                                { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2}];
+
     let arrFahrzeugDaten = [];
-    let setPersonnel = "";
-    let setNeeded = "";
-    let setNotyet = "";
-    let setExpansion = "";
-    let setURL = "";
-    let setEdit = "";
-    let setAssignPersonnel = "";
-    let setCrewMax = "";
-    let setCrewActMax = "";
-    let setAvailable = "";
-    let setInClass = "";
-    let setCarWord = "";
-    let setAllAssigned = "";
-    let setWithoutSchool = "";
-    let setWithoutCar = "";
-    let setInSchool = "";
-    let setEducation = "";
-    let setHeading = "";
-    let setOwner = "";
+    let setPersonnel = "", setNeeded = "", setNotyet = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "";
+    let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "";
 
     if(I18n.locale == "de"){
         arrFahrzeugDaten = arrFahrzeugDatenDE;
@@ -188,6 +222,27 @@ $(function() {
         setEducation = "Education";
         setHeading = "StationAmount";
         setOwner = "Owner";
+    } else if(I18n.locale == "nl"){
+        arrFahrzeugDaten = arrFahrzeugDatenNL;
+        setPersonnel = "Personeel";
+        setNeeded = "benodigd";
+        setNotyet = "momenteel niet";
+        setExpansion = "Verwijderen";
+        setURL = "meldkamerspel.com";
+        setEdit = "Bewerken";
+        setAssignPersonnel = "Personeel toewijzen";
+        setCrewMax = "Bezetting (Maximaal)";
+        setCrewActMax = "Bezetting (Actueel / Maximaal)";
+        setAvailable = "Beschikbaar";
+        setInClass = "In de klas";
+        setCarWord = "voertuig";
+        setAllAssigned = "allemaal toegewezen";
+        setWithoutSchool = "zonder opleiding";
+        setWithoutCar = "zonder een voertuig";
+        setInSchool = "In training";
+        setEducation = "opleiding";
+        setHeading = "PostAantal";
+        setOwner = "Eigenaar";
     }
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
@@ -233,7 +288,7 @@ $(function() {
         setEinfuegepunkt.before("(" + getPersonalBenoetigt + " " + setNeeded + ") ");
     }
 
-    function getAusbauDaten() {
+    function getAusbauZeit() {
         let setTextKeinAusbau = setNotyet; // Text wenn kein Ausbau stattfindet
         let getAusbauzeit = "";
         let getAusbauname = "";
@@ -262,6 +317,19 @@ $(function() {
         if(!getAusbauzeit) getAusbauzeit = setTextKeinAusbau;
 
         $("dl").first().append("<dt><strong>" + setExpansion + ":</strong></dt><dd>" + getAusbauname + "<span id='" + getIdName + "'>" + getAusbauzeit + "</span></dd>");
+    }
+
+    function getAusbauten(){
+        let getAusbauname = "";
+
+        if($("#ausbauten").length == 0) return false;
+
+        $("#ausbauten > table > tbody > tr").each(function() {
+            if($(".btn-group", this).length) getAusbauname += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + $(this).find("b").text() + "<br>";
+            else if($("span", this).length) getAusbauname += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + $(this).find("b").text() + "<br>";
+        });
+
+        $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbauname + "</dd>");
     }
 
     function setFMS() {
@@ -488,7 +556,8 @@ $(function() {
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== setOwner + ":") {
         getPersonalAnzahl(ignoriereFMS);
-        getAusbauDaten();
+        getAusbauZeit();
+        getAusbauten();
         setFMS();
         setEditButton(nurNeueFahrzeugnamen);
         setAktuellMaxPersonal();
