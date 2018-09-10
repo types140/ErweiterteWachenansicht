@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.4.0
+// @version      1.5.0
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -177,14 +177,13 @@ $(function() {
                                 { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2}];
 
     let arrFahrzeugDaten = [];
-    let setPersonnel = "", setNeeded = "", setNotyet = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "";
+    let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "";
     let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "";
 
     if(I18n.locale == "de"){
         arrFahrzeugDaten = arrFahrzeugDatenDE;
         setPersonnel = "Personal";
         setNeeded = "benötigt";
-        setNotyet = "derzeit nicht";
         setExpansion = "Ausbau";
         setURL = "leitstellenspiel.de";
         setEdit = "Bearbeiten";
@@ -205,7 +204,6 @@ $(function() {
         arrFahrzeugDaten = arrFahrzeugDatenEN;
         setPersonnel = "Personnel";
         setNeeded = "needed";
-        setNotyet = "not yet";
         setExpansion = "Expansion";
         setURL = "missionchief.com";
         setEdit = "Edit";
@@ -226,7 +224,6 @@ $(function() {
         arrFahrzeugDaten = arrFahrzeugDatenNL;
         setPersonnel = "Personeel";
         setNeeded = "benodigd";
-        setNotyet = "momenteel niet";
         setExpansion = "Verwijderen";
         setURL = "meldkamerspel.com";
         setEdit = "Bewerken";
@@ -288,35 +285,36 @@ $(function() {
         setEinfuegepunkt.before("(" + getPersonalBenoetigt + " " + setNeeded + ") ");
     }
 
-    function getAusbauDaten() {
-        let setTextKeinAusbau = setNotyet; // Text wenn kein Ausbau stattfindet
+    function getAusbau() {
         let getAusbauzeit = "";
         let getAusbauname = "";
-        let getIdName = "";
+        let getAusbaudaten = "";
 
         // Gebaeude ohne Ausbaumoeglichkeit ausschliessen
         if($("#ausbauten").length == 0) return false;
 
-        $("#ausbauten > table > tbody > tr").each(function(keyAusbau, valAusbau) {
+        $("#ausbauten > table > tbody > tr").each(function() {
+            getAusbauname = $(this).find("b").text();
 
-            // getAusbauname wird mit jedem Durchgang neu gesetzt
-            getAusbauname = $(this).find("b").text() + "<br/>";
-
-            // Suche nach der ID welche die laufende Zeit ermoeglicht
-            getIdName = $(this).find("span").attr("id");
-
-            // Erst wenn der entsprechende <span>-Tag gefunden wurde ...
-            getAusbauzeit = $(this).find("span[id^='extension_countdown_']").text();
-
-            // ... wird die Schleife unterbrochen und der aktuell gefundene Name des Ausbaus genutzt
-            if(getAusbauzeit) return false;
-            else getAusbauname = "";
+            // noch nicht ausgebaut - also existiert der Button
+            if($(".btn-group", this).length) {
+                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+            // entweder bereits gebaut ...
+            } else if($("span", this).length) {
+                // existiert ein Element mit einer ID ist es die Uhrzeit
+                if(typeof $(this).find("span").attr("id") !== typeof undefined && $(this).find("span").attr("id") !== false) {
+                    getAusbaudaten += "<span id='" + $(this).find("span").attr("id") + "' class='label label-success' style='background: orange;'>" + $(this).find("span[id^='extension_countdown_']").text() + "</span> " + getAusbauname + "<br>";
+                // existiert ein Element mit einer Class ist der Ausbau fertig
+                } else {
+                    getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                }
+            // ... oder ein Ausbau ist in Arbeit, sodass das Feld leer ist
+            } else {
+                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+            }
         });
 
-        // Wurde kein Ausbau in Arbeit gefunden wird nur ein selbstdefinierter Text ausgegeben
-        if(!getAusbauzeit) getAusbauzeit = setTextKeinAusbau;
-
-        $("dl").first().append("<dt><strong>" + setExpansion + ":</strong></dt><dd>" + getAusbauname + "<span id='" + getIdName + "'>" + getAusbauzeit + "</span></dd>");
+        if(getAusbaudaten != "") $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbaudaten + "</dd>");
     }
 
     function setFMS() {
@@ -543,7 +541,7 @@ $(function() {
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== setOwner + ":") {
         getPersonalAnzahl(ignoriereFMS);
-        getAusbauDaten();
+        getAusbau();
         setFMS();
         setEditButton(nurNeueFahrzeugnamen);
         setAktuellMaxPersonal();
