@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.5.0
+// @version      1.5.1
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -289,32 +289,67 @@ $(function() {
         let getAusbauzeit = "";
         let getAusbauname = "";
         let getAusbaudaten = "";
+        let arrAusbauten = [];
+        let getStatus = 0;
+        let found = false;
+        let getCountdown = "";
+        let outputName = "";
 
         // Gebaeude ohne Ausbaumoeglichkeit ausschliessen
         if($("#ausbauten").length == 0) return false;
 
         $("#ausbauten > table > tbody > tr").each(function() {
+            found = false;
             getAusbauname = $(this).find("b").text();
+            getCountdown = $(this).find("span[id^='extension_countdown_']").text(); // absolut einmalig auf der aktuellen Seite
 
             // noch nicht ausgebaut - also existiert der Button
             if($(".btn-group", this).length) {
-                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                getStatus = 0;
             // entweder bereits gebaut ...
             } else if($("span", this).length) {
                 // existiert ein Element mit einer ID ist es die Uhrzeit
                 if(typeof $(this).find("span").attr("id") !== typeof undefined && $(this).find("span").attr("id") !== false) {
-                    getAusbaudaten += "<span id='" + $(this).find("span").attr("id") + "' class='label label-success' style='background: orange;'>" + $(this).find("span[id^='extension_countdown_']").text() + "</span> " + getAusbauname + "<br>";
+                    getStatus = $(this).find("span").attr("id");
                 // existiert ein Element mit einer Class ist der Ausbau fertig
                 } else {
-                    getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                    getStatus = 1;
                 }
             // ... oder ein Ausbau ist in Arbeit, sodass das Feld leer ist
             } else {
-                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                getStatus = 0;
+            }
+
+            // bei der ersten Ueberpruefung ist das Array noch leer - der erste Eintrag wird sofort eingefuegt
+            if(arrAusbauten.length == 0) arrAusbauten.push({name:getAusbauname, status:getStatus, count:1});
+            else {
+                $.each(arrAusbauten, function(key, val){
+                    // nur wenn der Ausbau und der Status (gebaut oder nicht gebaut) uebereinstimmen wird der Zaehler um 1 erhoeht
+                    if(val.name == getAusbauname && val.status == getStatus){
+                        val.count++;
+                        found = true;
+                        return false;
+                    }
+                });
+
+                // sofern keine Uebereinstimmung gefunden wurde wird der neue Ausbau dem Array hinzugefuegt
+                if(found == false){ arrAusbauten.push({ name:getAusbauname, status:getStatus, count:1 }); }
             }
         });
 
-        if(getAusbaudaten != "") $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbaudaten + "</dd>");
+        $.each(arrAusbauten, function(key, val){
+            // ist der Zaehler groesser 1 muss die Anzahl mit dem Name zusammengebaut werden
+            if(val.count > 1) outputName = val.count + "x " + val.name;
+            else outputName = val.name;
+
+            // Abfragen welcher Ausbau welchen Status hat - entsprechende Ausgaben werden generiert
+            if(val.status == 0) getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + outputName + "<br>";
+            else if(val.status == 1) getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + outputName + "<br>";
+            else getAusbaudaten += "<span id='" + val.status + "' class='label label-success' style='background: orange;'>" + getCountdown + "</span> " + outputName + "<br>";
+        });
+
+        // finale Ausgabe
+        $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbaudaten + "</dd>");
     }
 
     function setFMS() {
