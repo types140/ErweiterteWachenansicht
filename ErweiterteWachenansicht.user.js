@@ -285,7 +285,7 @@ $(function() {
         setEinfuegepunkt.before("(" + getPersonalBenoetigt + " " + setNeeded + ") ");
     }
 
-    function getAusbau() {
+    function getAusbau(getBereitsGebaut) {
         let getAusbauzeit = "";
         let getAusbauname = "";
         let getAusbaudaten = "";
@@ -343,7 +343,9 @@ $(function() {
             else outputName = val.name;
 
             // Abfragen welcher Ausbau welchen Status hat - entsprechende Ausgaben werden generiert
-            if(val.status == 0) getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + outputName + "<br>";
+            if(val.status == 0) {
+                if(getBereitsGebaut == false) getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + outputName + "<br>";
+            }
             else if(val.status == 1) getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + outputName + "<br>";
             else getAusbaudaten += "<span id='" + val.status + "' class='label label-success' style='background: orange;'>" + getCountdown + "</span> " + outputName + "<br>";
         });
@@ -572,11 +574,12 @@ $(function() {
 
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
     const nurNeueFahrzeugnamen = false; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
+    const nurGebauteAusbauten = false; // auf true setzen um nur bereits gebaute oder in Bau befindliche Ausbauten darzustellen
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== setOwner + ":") {
         getPersonalAnzahl(ignoriereFMS);
-        getAusbau();
+        getAusbau(nurGebauteAusbauten);
         setFMS();
         setEditButton(nurNeueFahrzeugnamen);
         setAktuellMaxPersonal();
