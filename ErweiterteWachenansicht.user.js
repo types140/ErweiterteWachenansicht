@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.5.1
+// @version      1.5.2
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -177,7 +177,7 @@ $(function() {
                                 { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2}];
 
     let arrFahrzeugDaten = [];
-    let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "";
+    let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
     let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "";
 
     if(I18n.locale == "de"){
@@ -191,6 +191,7 @@ $(function() {
         setCrewMax = "Besatzung (Maximal)";
         setCrewActMax = "Besatzung (Aktuell / Maximal)";
         setAvailable = "Verfügbar";
+        setPresent = "vorhanden";
         setInClass = "Im Unterricht";
         setCarWord = "Fahrzeug";
         setAllAssigned = "alle zugewiesen";
@@ -211,6 +212,7 @@ $(function() {
         setCrewMax = "Crew (Max)";
         setCrewActMax = "Crew (actual / max)";
         setAvailable = "Available";
+        setPresent = "present";
         setInClass = "In a lesson";
         setCarWord = "Vehicle";
         setAllAssigned = "all assigned";
@@ -231,6 +233,7 @@ $(function() {
         setCrewMax = "Bezetting (Maximaal)";
         setCrewActMax = "Bezetting (Actueel / Maximaal)";
         setAvailable = "Beschikbaar";
+        setPresent = "voorhanden";
         setInClass = "In de klas";
         setCarWord = "voertuig";
         setAllAssigned = "allemaal toegewezen";
@@ -246,11 +249,13 @@ $(function() {
         let setEinfuegepunkt = "";
         let getFahrzeugTypId = -1;
         let getPersonalBenoetigt = 0;
+        let getAktuellPersonal = 0;
 
         $("#vehicle_table > tbody > tr").each(function() {
             // wenn FMS NICHT geprueft werden soll zaehle das Personal von allen Fahrzeugen
             if(getIgnoriereCheckFMS) {
                 getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
+                getAktuellPersonal += +($(this).find("td").last().text().trim());
             // wenn FMS geprueft werden soll ...
             } else {
                 // ... und FMS Status 6 gesetzt ist ignoriere das Personal
@@ -259,6 +264,7 @@ $(function() {
                 // ... und FMS Status 6 NICHT gesetzt ist zaehle das Personal dazu
                 } else {
                     getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
+                    getAktuellPersonal += +($(this).find("td").last().text().trim());
                 }
             }
 
@@ -277,12 +283,20 @@ $(function() {
         // nth-child = 6 => Feuerwache, Rettungswache, Bereitschaftspolizei, Polizeisondereinheiten
         // nth-child = 8 => Rettungshubschrauberstation, Polizeihubschrauberstation,
         //                  Wasserrettungswache, Feuerwache mit Abrollbehaeltern
-        if($("dl > dt:nth-child(3)").text() == setPersonnel + ":") setEinfuegepunkt = $("dl > dd:nth-child(4) > div");
-        else if($("dl > dt:nth-child(5)").text() == setPersonnel + ":") setEinfuegepunkt = $("dl > dd:nth-child(6) > div");
-        else setEinfuegepunkt = $("dl > dd:nth-child(8) > div");
+        if($("dl > dt:nth-child(3)").text() == setPersonnel + ":") {
+            setEinfuegepunkt = $("dl > dd:nth-child(4)");
+            $("dl > dt:nth-child(3) > strong").text(setPersonnel + " " + setPresent + ":");
+        } else if($("dl > dt:nth-child(5)").text() == setPersonnel + ":") {
+            setEinfuegepunkt = $("dl > dd:nth-child(6)");
+            $("dl > dt:nth-child(5) > strong").text(setPersonnel + " " + setPresent + ":");
+        } else {
+            setEinfuegepunkt = $("dl > dd:nth-child(8)");
+            $("dl > dt:nth-child(7) > strong").text(setPersonnel + " " + setPresent + ":");
+        }
 
         // orientiert sich am div innerhalb des dd-Tags, daher before
-        setEinfuegepunkt.before("(" + getPersonalBenoetigt + " " + setNeeded + ") ");
+        if(getAktuellPersonal < getPersonalBenoetigt) setEinfuegepunkt.after("<dt>" + setPersonnel + " " + setNeeded + ":</dt><dd>" + getAktuellPersonal + " Angestellte aktuell, " + getPersonalBenoetigt + " Angestellte maximal</dd>");
+        else setEinfuegepunkt.after("<dt>" + setPersonnel + " " + setNeeded + ":</dt><dd>" + getPersonalBenoetigt + " Angestellte</dd>");
     }
 
     function getAusbau(getBereitsGebaut) {
