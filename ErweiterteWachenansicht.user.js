@@ -651,6 +651,6 @@ $(function() {
         setPersonalButton();
         setEinsatzAusblenden();
         getPersonalAusbildung();
-        settings();
+        //settings();
     }
 });
