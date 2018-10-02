@@ -178,7 +178,7 @@ $(function() {
 
     let arrFahrzeugDaten = [];
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
-    let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "";
+    let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "", setAssemblyArea = "";
 
     if(I18n.locale == "de"){
         arrFahrzeugDaten = arrFahrzeugDatenDE;
@@ -201,6 +201,7 @@ $(function() {
         setEducation = "Ausbildung";
         setHeading = "WacheAnzahl";
         setOwner = "Besitzer";
+        setAssemblyArea = "Fahrzeuge am Bereitstellungsraum";
     } else if(I18n.locale == "en"){
         arrFahrzeugDaten = arrFahrzeugDatenEN;
         setPersonnel = "Personnel";
@@ -222,6 +223,7 @@ $(function() {
         setEducation = "Education";
         setHeading = "StationAmount";
         setOwner = "Owner";
+        setAssemblyArea = "Vehicles at the staging area";
     } else if(I18n.locale == "nl"){
         arrFahrzeugDaten = arrFahrzeugDatenNL;
         setPersonnel = "Personeel";
@@ -243,6 +245,7 @@ $(function() {
         setEducation = "opleiding";
         setHeading = "PostAantal";
         setOwner = "Eigenaar";
+        setAssemblyArea = "Voertuigen op de verzamelplaats";
     }
 
     function getSumBereitstellung(){
@@ -253,12 +256,17 @@ $(function() {
 
         $("#vehicle_table >> tr").each(function(key, val){
             found = false;
+            
+            // Fahrzeug-ID herausfiltern
             getVehicleId = $("td", this).find("img").attr("vehicle_type_id");
 
+            // das erste Object innerhalb des Arrays
             if(arrVehicles.length == 0) arrVehicles.push({id: getVehicleId, count: 1});
             else {
                 $.each(arrVehicles, function(key, val) {
                     if(val.id == getVehicleId) {
+                        // Stimmt die ID im Array mit der ausgelesenen ID des aktuellen Fahrzeugs ueberein
+                        // erhoehe die Anzahl
                         val.count++;
 
                         found = true;
@@ -272,6 +280,7 @@ $(function() {
 
         console.table(arrVehicles);
 
+        // durchlaufe das Array mit den gefundenen Fahrzeugen
         $.each(arrVehicles, function(key1, val1){
             if(val1.id == undefined) return true;
 
@@ -280,7 +289,7 @@ $(function() {
             output += "<br>";
         });
 
-        $("[building_type='14'").next().after("<dl><dt>Fahrzeuge am Bereitstellungsraum:</dt><dd>" + output + "</dd></dl>");
+        $("[building_type='14'").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
     }
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
