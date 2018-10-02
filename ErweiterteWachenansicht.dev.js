@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht_DEV
-// @version      1.5.0
+// @version      1.6.0
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -177,7 +177,7 @@ $(function() {
                                 { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2}];
 
     let arrFahrzeugDaten = [];
-    let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "";
+    let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
     let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "";
 
     if(I18n.locale == "de"){
@@ -191,6 +191,7 @@ $(function() {
         setCrewMax = "Besatzung (Maximal)";
         setCrewActMax = "Besatzung (Aktuell / Maximal)";
         setAvailable = "Verfügbar";
+        setPresent = "vorhanden";
         setInClass = "Im Unterricht";
         setCarWord = "Fahrzeug";
         setAllAssigned = "alle zugewiesen";
@@ -211,6 +212,7 @@ $(function() {
         setCrewMax = "Crew (Max)";
         setCrewActMax = "Crew (actual / max)";
         setAvailable = "Available";
+        setPresent = "present";
         setInClass = "In a lesson";
         setCarWord = "Vehicle";
         setAllAssigned = "all assigned";
@@ -231,6 +233,7 @@ $(function() {
         setCrewMax = "Bezetting (Maximaal)";
         setCrewActMax = "Bezetting (Actueel / Maximaal)";
         setAvailable = "Beschikbaar";
+        setPresent = "voorhanden";
         setInClass = "In de klas";
         setCarWord = "voertuig";
         setAllAssigned = "allemaal toegewezen";
@@ -242,15 +245,55 @@ $(function() {
         setOwner = "Eigenaar";
     }
 
+    function getSumBereitstellung(){
+        let getVehicleId = "";
+        let arrVehicles = [];
+        let found = false;
+        let output = "";
+
+        $("#vehicle_table >> tr").each(function(key, val){
+            found = false;
+            getVehicleId = $("td", this).find("img").attr("vehicle_type_id");
+
+            if(arrVehicles.length == 0) arrVehicles.push({id: getVehicleId, count: 1});
+            else {
+                $.each(arrVehicles, function(key, val) {
+                    if(val.id == getVehicleId) {
+                        val.count++;
+
+                        found = true;
+                        return false;
+                    }
+                });
+
+                if(found == false) arrVehicles.push({id: getVehicleId, count: 1});
+            }
+        });
+
+        console.table(arrVehicles);
+
+        $.each(arrVehicles, function(key1, val1){
+            if(val1.id == undefined) return true;
+
+            output += val1.count + "x ";
+            $.each(arrFahrzeugDaten, function(key2, val2){ if(val1.id == val2.id) output += val2.name; });
+            output += "<br>";
+        });
+
+        $("[building_type='14'").next().after("<dl><dt>Fahrzeuge am Bereitstellungsraum:</dt><dd>" + output + "</dd></dl>");
+    }
+
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
         let setEinfuegepunkt = "";
         let getFahrzeugTypId = -1;
         let getPersonalBenoetigt = 0;
+        let getAktuellPersonal = 0;
 
         $("#vehicle_table > tbody > tr").each(function() {
             // wenn FMS NICHT geprueft werden soll zaehle das Personal von allen Fahrzeugen
             if(getIgnoriereCheckFMS) {
                 getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
+                getAktuellPersonal += +($(this).find("td").last().text().trim());
             // wenn FMS geprueft werden soll ...
             } else {
                 // ... und FMS Status 6 gesetzt ist ignoriere das Personal
@@ -259,8 +302,12 @@ $(function() {
                 // ... und FMS Status 6 NICHT gesetzt ist zaehle das Personal dazu
                 } else {
                     getFahrzeugTypId = $(this).find("img").attr("vehicle_type_id");
+                    getAktuellPersonal += +($(this).find("td").last().text().trim());
                 }
             }
+
+            // Quickfix bei Wachen ohne Fahrzeugen
+            if($(this).find("img").attr("vehicle_type_id") == "undefined") getFahrzeugTypId = "";
 
             // pruefe ob aktuelle FahrzeugTypId mit einer ID aus der Fahrzeugliste
             // oben uebereinstimmt. Wenn ja: zaehle zum benoetigten Personal dazu
@@ -277,44 +324,89 @@ $(function() {
         // nth-child = 6 => Feuerwache, Rettungswache, Bereitschaftspolizei, Polizeisondereinheiten
         // nth-child = 8 => Rettungshubschrauberstation, Polizeihubschrauberstation,
         //                  Wasserrettungswache, Feuerwache mit Abrollbehaeltern
-        if($("dl > dt:nth-child(3)").text() == setPersonnel + ":") setEinfuegepunkt = $("dl > dd:nth-child(4) > div");
-        else if($("dl > dt:nth-child(5)").text() == setPersonnel + ":") setEinfuegepunkt = $("dl > dd:nth-child(6) > div");
-        else setEinfuegepunkt = $("dl > dd:nth-child(8) > div");
+        if($("dl > dt:nth-child(3)").text() == setPersonnel + ":") {
+            setEinfuegepunkt = $("dl > dd:nth-child(4)");
+            $("dl > dt:nth-child(3) > strong").text(setPersonnel + " " + setPresent + ":");
+        } else if($("dl > dt:nth-child(5)").text() == setPersonnel + ":") {
+            setEinfuegepunkt = $("dl > dd:nth-child(6)");
+            $("dl > dt:nth-child(5) > strong").text(setPersonnel + " " + setPresent + ":");
+        } else {
+            setEinfuegepunkt = $("dl > dd:nth-child(8)");
+            $("dl > dt:nth-child(7) > strong").text(setPersonnel + " " + setPresent + ":");
+        }
 
         // orientiert sich am div innerhalb des dd-Tags, daher before
-        setEinfuegepunkt.before("(" + getPersonalBenoetigt + " " + setNeeded + ") ");
+        if(getAktuellPersonal < getPersonalBenoetigt) setEinfuegepunkt.after("<dt>" + setPersonnel + " " + setNeeded + ":</dt><dd>" + getAktuellPersonal + " Angestellte aktuell, " + getPersonalBenoetigt + " Angestellte maximal</dd>");
+        else setEinfuegepunkt.after("<dt>" + setPersonnel + " " + setNeeded + ":</dt><dd>" + getPersonalBenoetigt + " Angestellte</dd>");
     }
 
-    function getAusbau() {
+    function getAusbau(getBereitsGebaut) {
         let getAusbauzeit = "";
         let getAusbauname = "";
         let getAusbaudaten = "";
+        let arrAusbauten = [];
+        let getStatus = 0;
+        let found = false;
+        let getCountdown = "";
+        let outputName = "";
 
         // Gebaeude ohne Ausbaumoeglichkeit ausschliessen
         if($("#ausbauten").length == 0) return false;
 
         $("#ausbauten > table > tbody > tr").each(function() {
+            found = false;
             getAusbauname = $(this).find("b").text();
+            getCountdown = $(this).find("span[id^='extension_countdown_']").text(); // absolut einmalig auf der aktuellen Seite
 
             // noch nicht ausgebaut - also existiert der Button
             if($(".btn-group", this).length) {
-                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                getStatus = 0;
             // entweder bereits gebaut ...
             } else if($("span", this).length) {
                 // existiert ein Element mit einer ID ist es die Uhrzeit
                 if(typeof $(this).find("span").attr("id") !== typeof undefined && $(this).find("span").attr("id") !== false) {
-                    getAusbaudaten += "<span id='" + $(this).find("span").attr("id") + "' class='label label-success' style='background: orange;'>" + $(this).find("span[id^='extension_countdown_']").text() + "</span> " + getAusbauname + "<br>";
+                    getStatus = $(this).find("span").attr("id");
                 // existiert ein Element mit einer Class ist der Ausbau fertig
                 } else {
-                    getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                    getStatus = 1;
                 }
             // ... oder ein Ausbau ist in Arbeit, sodass das Feld leer ist
             } else {
-                getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + getAusbauname + "<br>";
+                getStatus = 0;
+            }
+
+            // bei der ersten Ueberpruefung ist das Array noch leer - der erste Eintrag wird sofort eingefuegt
+            if(arrAusbauten.length == 0) arrAusbauten.push({name:getAusbauname, status:getStatus, count:1});
+            else {
+                $.each(arrAusbauten, function(key, val){
+                    // nur wenn der Ausbau und der Status (gebaut oder nicht gebaut) uebereinstimmen wird der Zaehler um 1 erhoeht
+                    if(val.name == getAusbauname && val.status == getStatus){
+                        val.count++;
+                        found = true;
+                        return false;
+                    }
+                });
+
+                // sofern keine Uebereinstimmung gefunden wurde wird der neue Ausbau dem Array hinzugefuegt
+                if(found == false){ arrAusbauten.push({ name:getAusbauname, status:getStatus, count:1 }); }
             }
         });
 
-        if(getAusbaudaten != "") $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbaudaten + "</dd>");
+        $.each(arrAusbauten, function(key, val){
+            // ist der Zaehler groesser 1 muss die Anzahl mit dem Name zusammengebaut werden
+            if(val.count > 1) outputName = val.count + "x " + val.name;
+            else outputName = val.name;
+
+            // Abfragen welcher Ausbau welchen Status hat - entsprechende Ausgaben werden generiert
+            if(val.status == 0) {
+                if(getBereitsGebaut == false) getAusbaudaten += "<span class='label label-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span></span> " + outputName + "<br>";
+            }
+            else if(val.status == 1) getAusbaudaten += "<span class='label label-success'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span></span> " + outputName + "<br>";
+            else getAusbaudaten += "<span id='" + val.status + "' class='label label-success' style='background: orange;'>" + getCountdown + "</span> " + outputName + "<br>";
+        });
+
+        // finale Ausgabe
+        $("dl").first().append("<dt><strong>Ausbauten:</strong></dt><dd>" + getAusbaudaten + "</dd>");
     }
 
     function setFMS() {
@@ -537,16 +629,19 @@ $(function() {
 
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
     const nurNeueFahrzeugnamen = false; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
+    const nurGebauteAusbauten = false; // auf true setzen um nur bereits gebaute oder in Bau befindliche Ausbauten darzustellen
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== setOwner + ":") {
+        getSumBereitstellung();
         getPersonalAnzahl(ignoriereFMS);
-        getAusbau();
+        getAusbau(nurGebauteAusbauten);
         setFMS();
         setEditButton(nurNeueFahrzeugnamen);
         setAktuellMaxPersonal();
         setPersonalButton();
         setEinsatzAusblenden();
         getPersonalAusbildung();
+        settings();
     }
 });
