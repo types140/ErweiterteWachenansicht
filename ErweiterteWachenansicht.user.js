@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.5.2
+// @version      1.6.0
 // @author       Allure149
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -245,6 +245,44 @@ $(function() {
         setOwner = "Eigenaar";
     }
 
+    function getSumBereitstellung(){
+        let getVehicleId = "";
+        let arrVehicles = [];
+        let found = false;
+        let output = "";
+
+        $("#vehicle_table >> tr").each(function(key, val){
+            found = false;
+            getVehicleId = $("td", this).find("img").attr("vehicle_type_id");
+
+            if(arrVehicles.length == 0) arrVehicles.push({id: getVehicleId, count: 1});
+            else {
+                $.each(arrVehicles, function(key, val) {
+                    if(val.id == getVehicleId) {
+                        val.count++;
+
+                        found = true;
+                        return false;
+                    }
+                });
+
+                if(found == false) arrVehicles.push({id: getVehicleId, count: 1});
+            }
+        });
+
+        console.table(arrVehicles);
+
+        $.each(arrVehicles, function(key1, val1){
+            if(val1.id == undefined) return true;
+
+            output += val1.count + "x ";
+            $.each(arrFahrzeugDaten, function(key2, val2){ if(val1.id == val2.id) output += val2.name; });
+            output += "<br>";
+        });
+
+        $("[building_type='14'").next().after("<dl><dt>Fahrzeuge am Bereitstellungsraum:</dt><dd>" + output + "</dd></dl>");
+    }
+
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
         let setEinfuegepunkt = "";
         let getFahrzeugTypId = -1;
@@ -267,6 +305,9 @@ $(function() {
                     getAktuellPersonal += +($(this).find("td").last().text().trim());
                 }
             }
+
+            // Quickfix bei Wachen ohne Fahrzeugen
+            if($(this).find("img").attr("vehicle_type_id") == "undefined") getFahrzeugTypId = "";
 
             // pruefe ob aktuelle FahrzeugTypId mit einer ID aus der Fahrzeugliste
             // oben uebereinstimmt. Wenn ja: zaehle zum benoetigten Personal dazu
@@ -592,6 +633,7 @@ $(function() {
 
     // nur auf eigene Wachen anwenden
     if($("dl > dt:nth-child(1) > strong").text() !== setOwner + ":") {
+        getSumBereitstellung();
         getPersonalAnzahl(ignoriereFMS);
         getAusbau(nurGebauteAusbauten);
         setFMS();
@@ -600,5 +642,6 @@ $(function() {
         setPersonalButton();
         setEinsatzAusblenden();
         getPersonalAusbildung();
+        settings();
     }
 });
