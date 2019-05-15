@@ -128,7 +128,7 @@ $(function() {
                                 { id: 23, name: "Police Motorcycle", personal: 1},
                                 { id: 24, name: "Large Fireboat", personal: 0},
                                 { id: 25, name: "Large Rescue Boat", personal: 0},
-                                { id: 26, name: "SWAT SUV", personal: 6},
+                                { id: 26, name: "SWAT SUV", personal: 4},
                                 { id: 27, name: "BLS Ambulance", personal: 2},
                                 { id: 28, name: "EMS Rescue", personal: 5}];
 
