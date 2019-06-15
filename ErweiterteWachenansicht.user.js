@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.0
-// @author       Allure149
+// @version      1.6.1
+// @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
 // @include      *://www.meldkamerspel.com/buildings/*
@@ -96,14 +96,18 @@ $(function() {
                                 { id: 83, name: "GW-Werkfeuerwehr", personal: 9 },
                                 { id: 84, name: "ULF mit Löscharm", personal: 3 },
                                 { id: 85, name: "TM 50", personal: 3 },
-                                { id: 86, name: "Turbolöscher", personal: 3 }];
+                                { id: 86, name: "Turbolöscher", personal: 3 },
+                                { id: 87, name: "TLF 4000", personal: 3},
+                                { id: 88, name: "KLF", personal: 6},
+                                { id: 89, name: "MLF", personal: 6},
+                                { id: 90, name: "HLF 10", personal: 9}];
 
     const arrFahrzeugDatenEN = [{ id: 0, name: "Type 1 fire engine", personal: 6},
                                 { id: 1, name: "Type 2 fire engine", personal: 3},
                                 { id: 2, name: "Platform truck", personal: 3},
                                 { id: 3, name: "Battalion Chief Unit", personal: 3},
                                 { id: 4, name: "Heavy Rescue Vehicle", personal: 4},
-                                { id: 5, name: "Ambulance", personal: 2},
+                                { id: 5, name: "ALS Ambulance", personal: 2},
                                 { id: 6, name: "Mobile air", personal: 3},
                                 { id: 7, name: "Water Tanker", personal: 3},
                                 { id: 8, name: "Utility unit", personal: 4},
@@ -124,7 +128,9 @@ $(function() {
                                 { id: 23, name: "Police Motorcycle", personal: 1},
                                 { id: 24, name: "Large Fireboat", personal: 0},
                                 { id: 25, name: "Large Rescue Boat", personal: 0},
-                                { id: 26, name: "SWAT SUV", personal: 6}];
+                                { id: 26, name: "SWAT SUV", personal: 4},
+                                { id: 27, name: "BLS Ambulance", personal: 2},
+                                { id: 28, name: "EMS Rescue", personal: 5}];
 
     const arrFahrzeugDatenNL = [{ id: 0, name: "SIV | Snel Interventie Voertuig", personal: 2},
                                 { id: 1, name: "TS 8/9 | Tankautospuit (8/9 personen)", personal: 9},
@@ -174,7 +180,10 @@ $(function() {
                                 { id: 45, name: "DBH | Dompelpomphaakarmbak", personal: 0},
                                 { id: 46, name: "DM Noddhulp | Dienstmotorfiets Noodhulp", personal: 2},
                                 { id: 47, name: "DA Hondengeleider | Dienstauto Hondengeleider", personal: 2},
-                                { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2}];
+                                { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2},
+                                { id: 49, name: "PM-OR | Materieelvoertuig - Oppervlakteredding", personal: 9},
+                                { id: 50, name: "TS-OR | Tankautospuit - Oppervlakteredding", personal: 9},
+                                { id: 51, name: "HVH | HulpverleningsHaakarmbak", personal: 0}];
 
     let arrFahrzeugDaten = [];
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
@@ -256,7 +265,6 @@ $(function() {
 
         $("#vehicle_table >> tr").each(function(key, val){
             found = false;
-            
             // Fahrzeug-ID herausfiltern
             getVehicleId = $("td", this).find("img").attr("vehicle_type_id");
 
@@ -456,30 +464,6 @@ $(function() {
         setTimeout( function() { location.reload(); }, 250);
     }
 
-    function setEditButton(getNurNeueFahrzeugnamen) {
-        let getFahrzeugId = "";
-        let getFahrzeugName = "";
-        let getIstInArray = "";
-
-        $("#vehicle_table > tbody > tr").each(function() {
-            getFahrzeugId = $(this).find("a").attr("href").replace("/vehicles/", "");
-            getFahrzeugName = $(this).find("a").first().text();
-            // Wenn sich der gefundene Fahrzeugname in der Liste befindet ist er Standart,
-            // wenn nicht wird undefined zurueckgegeben
-            getIstInArray = $.grep(arrFahrzeugDaten, function(n) { return n.name == getFahrzeugName; })[0];
-
-            // Wenn getNurNeueFahrzeugnamen === true muss geprueft werden ob es sich bei dem
-            // Fahrzeugnamen noch um einen Standartnamen handelt
-            if(getNurNeueFahrzeugnamen) {
-                // wenn getIstInArray undefined ist wurde der Fahrzeugname nicht in der Liste gefunden
-                // damit ist der Name bereits editiert worden und der Button wird nicht angezeigt
-                if(getIstInArray == undefined) return true;
-                $("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='" + setEdit + "' class='glyphicon glyphicon-pencil'></span></a>").appendTo($(this).find("a").first());
-            } else {
-                $("<a href='/vehicles/" + getFahrzeugId + "/edit' class='btn btn-default btn-xs' style='margin-left: 10px'><span title='" + setEdit + "' class='glyphicon glyphicon-pencil'></span></a>").appendTo($(this).find("a").first());
-            }
-        });
-    }
 
     function setPersonalButton() {
         let getFahrzeugId = "";
@@ -493,7 +477,7 @@ $(function() {
     function setEinsatzAusblenden() {
         $("#vehicle_table >> tr").each(function() {
             // Entferne vollstaendig die 4. Spalte der Tabelle = aktuelle Einsaetze
-            $(":nth-child(4)", this).remove();
+            $(":nth-child(5)", this).remove();
         });
     }
 
@@ -637,7 +621,6 @@ $(function() {
     }
 
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
-    const nurNeueFahrzeugnamen = false; // auf true setzen um den Edit-Button nur bei nicht umbenannten Fahrzeugen anzeigen zu lassen
     const nurGebauteAusbauten = false; // auf true setzen um nur bereits gebaute oder in Bau befindliche Ausbauten darzustellen
 
     // nur auf eigene Wachen anwenden
@@ -646,7 +629,6 @@ $(function() {
         getPersonalAnzahl(ignoriereFMS);
         getAusbau(nurGebauteAusbauten);
         setFMS();
-        setEditButton(nurNeueFahrzeugnamen);
         setAktuellMaxPersonal();
         setPersonalButton();
         setEinsatzAusblenden();
