@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.1
+// @version      1.6.2
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -372,7 +372,7 @@ $(function() {
 
         $("#ausbauten > table > tbody > tr").each(function() {
             found = false;
-            getAusbauname = $(this).find("b").text();
+            getAusbauname = $(this).find("b").text().replace("Zur Warteschlange hinzufügen:", "");
             getCountdown = $(this).find("span[id^='extension_countdown_']").text(); // absolut einmalig auf der aktuellen Seite
 
             // noch nicht ausgebaut - also existiert der Button
