@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.3
+// @version      1.6.4
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
@@ -189,7 +189,7 @@ $(function() {
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
     let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "", setAssemblyArea = "";
 
-    if(I18n.locale == "de"){
+    if(I18n.locale == "de_DE"){
         arrFahrzeugDaten = arrFahrzeugDatenDE;
         setPersonnel = "Personal";
         setNeeded = "benötigt";
