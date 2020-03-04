@@ -5,6 +5,7 @@
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
 // @include      *://www.meldkamerspel.com/buildings/*
+// @updateURL    https://github.com/types140/ErweiterteWachenansicht/raw/master/ErweiterteWachenansicht.user.js
 // @grant        none
 // ==/UserScript==
 /* global $ */
