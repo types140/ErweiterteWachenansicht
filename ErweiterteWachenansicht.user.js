@@ -1,10 +1,13 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.4
+// @version      1.6.5
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
+// @include      *://leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
+// @include      *://missionchief.com/buildings/*
 // @include      *://www.meldkamerspel.com/buildings/*
+// @include      *://meldkamerspel.com/buildings/*
 // @updateURL    https://github.com/types140/ErweiterteWachenansicht/raw/master/ErweiterteWachenansicht.user.js
 // @grant        none
 // ==/UserScript==
