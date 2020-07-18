@@ -703,7 +703,7 @@ $(function() {
             output += "</tr>";
         });
 
-        if($("dl > dt:nth-child(1)").text() == setHeading) $("dl").last().append("<dt><strong>Fahrzeuge:</strong></dt><dd><table>" + output + "</table></dd>");
+        if ($("dl > dt:nth-child(1)").text() == setHeading) $("dl").last().append("<dt><strong>"+ setCarWord +":</strong></dt><dd><table>" + output + "</table></dd>");
 
     }
 
