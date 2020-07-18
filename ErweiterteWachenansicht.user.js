@@ -1,10 +1,14 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.2
+// @version      1.6.5
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
+// @include      *://leitstellenspiel.de/buildings/*
 // @include      *://www.missionchief.com/buildings/*
+// @include      *://missionchief.com/buildings/*
 // @include      *://www.meldkamerspel.com/buildings/*
+// @include      *://meldkamerspel.com/buildings/*
+// @updateURL    https://github.com/types140/ErweiterteWachenansicht/raw/master/ErweiterteWachenansicht.user.js
 // @grant        none
 // ==/UserScript==
 /* global $ */
@@ -189,7 +193,7 @@ $(function() {
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
     let setInClass = "", setCarWord = "", setAllAssigned = "", setWithoutSchool = "", setWithoutCar = "", setInSchool = "", setEducation = "", setHeading = "", setOwner = "", setAssemblyArea = "";
 
-    if(I18n.locale == "de"){
+    if(I18n.locale == "de_DE"){
         arrFahrzeugDaten = arrFahrzeugDatenDE;
         setPersonnel = "Personal";
         setNeeded = "benötigt";
@@ -211,7 +215,7 @@ $(function() {
         setHeading = "WacheAnzahl";
         setOwner = "Besitzer";
         setAssemblyArea = "Fahrzeuge am Bereitstellungsraum";
-    } else if(I18n.locale == "en"){
+    } else if(I18n.locale == "en_US"){
         arrFahrzeugDaten = arrFahrzeugDatenEN;
         setPersonnel = "Personnel";
         setNeeded = "needed";
@@ -233,7 +237,7 @@ $(function() {
         setHeading = "StationAmount";
         setOwner = "Owner";
         setAssemblyArea = "Vehicles at the staging area";
-    } else if(I18n.locale == "nl"){
+    } else if(I18n.locale == "nl_NL"){
         arrFahrzeugDaten = arrFahrzeugDatenNL;
         setPersonnel = "Personeel";
         setNeeded = "benodigd";
@@ -286,8 +290,6 @@ $(function() {
             }
         });
 
-        console.table(arrVehicles);
-
         // durchlaufe das Array mit den gefundenen Fahrzeugen
         $.each(arrVehicles, function(key1, val1){
             if(val1.id == undefined) return true;
@@ -297,7 +299,7 @@ $(function() {
             output += "<br>";
         });
 
-        $("[building_type='14'").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
+        $("h1[building_type='14']").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
     }
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
@@ -535,7 +537,7 @@ $(function() {
             getFahrzeug = $("td:nth-child(3)", this).text().trim(" ");
 
             // filtert die Verfuegbarkeit der aktuellen Person
-            getVerfuegbarkeit = $("td:nth-child(4)", this).text().trim(" ").replace(setInClass + ": ", "").replace(" Lehrgang", "");
+            getVerfuegbarkeit = $("td:nth-child(4)", this).text().trim(" ").replace(setInClass + ": ", "").replace(" Lehrgang", "").replace("-Ausbildung", "");
 
             // wenn sich die Person auf einem Einsatz befindet muss sie den Status Verfügbar erhalten - anders kann es sonst nicht
             // ausgewertet werden
@@ -620,6 +622,88 @@ $(function() {
         if($("dl > dt:nth-child(1)").text() == setHeading) $("dl").last().append("<dt><strong>" + setEducation + ":</strong></dt><dd><table>" + output + "</table></dd>");
     }
 
+    async function getCars(){
+        let geturl = "";
+        let output = "";
+        let arrCars = [];
+        let found = false;
+        let carname = "";
+
+        geturl = $("dd:first > a").attr("href");
+
+        var response = $.parseHTML(await getAllAssignedUnits(geturl));
+
+        var vehicles = $(response).find("tbody > tr").find("td:nth-child(1)").find("img");
+
+        vehicles.each((e, t) => {
+            found = false;
+            //get URL of vehicle (vehicle ID)
+            var vehicleUrl = $(t).attr("vehicle_type_id");
+
+            $.each(arrFahrzeugDaten, function(key, val){
+                if(val.id == vehicleUrl){
+                    carname = val.name;
+                    return false;
+                }
+            });
+
+            // das if wird nur bei der ersten auszuwertenden Person genutzt, andernfalls ...
+            if(arrCars.length == 0) arrCars.push({name:carname, count:1});
+
+            // ... beginnt die Auswertung des Arrays
+            else {
+                $.each(arrCars, function(key, val) {
+                    // wenn sich die Ausbildung der aktuellen Person im Array befindet ...
+                    if(val.name == carname) {
+                        // ... erhoehe die insgesamt zu zaehlenden Personen um eins
+                        val.count++;
+
+                        // ... und markiere als gefunden
+                        found = true;
+                        return false;
+                    }
+                });
+
+                // wurde die Ausbildung der aktuellen Person nicht im Array gefunden muss es hinzugefuegt werden
+                if(found == false) arrCars.push({name:carname, count:1});
+            }
+        });
+
+        arrCars.sort(function(a, b) {
+            return a[1] - b[1];
+        });
+
+        $.each(arrCars, function(key, val){
+            output += "<tr style='border-bottom: 1px solid #DCDCDC'>";
+            output += "<td style='text-align:right'>" + val.count + "x&nbsp;</td>";
+            output += "<td style='text-align:center'>" + val.name + " </td>";
+            output += "</tr>";
+        });
+
+        if($("dl > dt:nth-child(1)").text() == setHeading) $("dl").last().append("<dt><strong>Fahrzeuge:</strong></dt><dd><table>" + output + "</table></dd>");
+
+    }
+
+    function getAllAssignedUnits(vehUrl)
+    {
+        //Make ASYNC Call to workers page
+        return new Promise(resolve => {
+            $.ajax({
+                type: "GET",
+                url: vehUrl,
+                success: function(data)
+                {
+                    resolve(data);
+                }
+            });
+        })
+    }
+
+    function newTabOverview(){
+        $(".nav-tabs").append("<li role='presentation'><a href='#wa-overview' aria-controls='ausbauten' role='tab' data-toggle='tab'>Übersicht</a></li>");
+        $(".tab-content").append("<div role='tabpanel' class='tab-pane' id='wa-overview'>Übersichtsinhalt</div>");
+    }
+
     const ignoriereFMS = true; // auf true setzen um FMS 6 zu ignorieren
     const nurGebauteAusbauten = false; // auf true setzen um nur bereits gebaute oder in Bau befindliche Ausbauten darzustellen
 
@@ -629,10 +713,12 @@ $(function() {
         getPersonalAnzahl(ignoriereFMS);
         getAusbau(nurGebauteAusbauten);
         setFMS();
-        setAktuellMaxPersonal();
+        //setAktuellMaxPersonal();
         setPersonalButton();
-        setEinsatzAusblenden();
+        //setEinsatzAusblenden();
         getPersonalAusbildung();
+        getCars();
+        //newTabOverview();
         //settings();
     }
 });
