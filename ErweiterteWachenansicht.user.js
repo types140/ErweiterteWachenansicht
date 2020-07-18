@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.5
+// @version      1.6.6
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://leitstellenspiel.de/buildings/*
@@ -101,10 +101,13 @@ $(function() {
                                 { id: 84, name: "ULF mit Löscharm", personal: 3 },
                                 { id: 85, name: "TM 50", personal: 3 },
                                 { id: 86, name: "Turbolöscher", personal: 3 },
-                                { id: 87, name: "TLF 4000", personal: 3},
-                                { id: 88, name: "KLF", personal: 6},
-                                { id: 89, name: "MLF", personal: 6},
-                                { id: 90, name: "HLF 10", personal: 9}];
+                                { id: 87, name: "TLF 4000", personal: 3 },
+                                { id: 88, name: "KLF", personal: 6 },
+                                { id: 89, name: "MLF", personal: 6 },
+                                { id: 90, name: "HLF 10", personal: 9 },
+                                { id: 91, name: "Rettungshundefahrzeug", personal: 5 },
+                                { id: 92, name: "Anh Hund", personal: 0 },
+                                { id: 93, name: "MTW-OV", personal: 5 }];
 
     const arrFahrzeugDatenEN = [{ id: 0, name: "Type 1 fire engine", personal: 6},
                                 { id: 1, name: "Type 2 fire engine", personal: 3},
@@ -133,8 +136,19 @@ $(function() {
                                 { id: 24, name: "Large Fireboat", personal: 0},
                                 { id: 25, name: "Large Rescue Boat", personal: 0},
                                 { id: 26, name: "SWAT SUV", personal: 4},
-                                { id: 27, name: "BLS Ambulance", personal: 2},
-                                { id: 28, name: "EMS Rescue", personal: 5}];
+                                { id: 27, name: "BLS Ambulance", personal: 2 },
+                                { id: 28, name: "EMS Rescue", personal: 5 },
+                                { id: 29, name: "EMS Chief", personal: 2 },
+                                { id: 30, name: "Type 3 engine", personal: 5 },
+                                { id: 31, name: "Type 5 engine", personal: 3 },
+                                { id: 32, name: "Type 7 engine", personal: 2 },
+                                { id: 33, name: "Pumper Tanker", personal: 6 },
+                                { id: 34, name: "Crew Carrier", personal: 12 },
+                                { id: 35, name: "Water drop helicopter", personal: 5 },
+                                { id: 36, name: "Air tanker", personal: 5 },
+                                { id: 37, name: "Heavy air tanker", personal: 5 },
+                                { id: 38, name: "Type 4 engine", personal: 5 },
+                                { id: 39, name: "Type 6 engine", personal: 2 }];
 
     const arrFahrzeugDatenNL = [{ id: 0, name: "SIV | Snel Interventie Voertuig", personal: 2},
                                 { id: 1, name: "TS 8/9 | Tankautospuit (8/9 personen)", personal: 9},
@@ -176,18 +190,24 @@ $(function() {
                                 { id: 37, name: "MMT-Auto", personal: 4},
                                 { id: 38, name: "OvD-G | Officier van Dienst - Geneeskunde", personal: 1},
                                 { id: 39, name: "ME Commandovoertuig | Mobiele Eenheid - Commandovoertuig", personal: 4},
-                                { id: 40, name: "ME Groepsvoertuig | Mobiele Eenheid - Groepsvoertuig", personal: 2},
-                                { id: 41, name: "CT (8x8) | Crashtender (8x8)", personal: 0},
-                                { id: 42, name: "CT (6x6) | Crashtender (6x6)", personal: 0},
-                                { id: 43, name: "CT (4x4) | Crashtender (4x4)", personal: 0},
-                                { id: 44, name: "AFO/OSC | Airport Fire Officer / On Scene Commander", personal: 0},
+                                { id: 40, name: "ME Flexbus | Mobiele Eenheid - Flexbus", personal: 2},
+                                { id: 41, name: "CT (8x8) | Crashtender (8x8)", personal: 3},
+                                { id: 42, name: "CT (6x6) | Crashtender (6x6)", personal: 3},
+                                { id: 43, name: "CT (4x4) | Crashtender (4x4)", personal: 3},
+                                { id: 44, name: "AFO/OSC | Airport Fire Officer / On Scene Commander", personal: 2},
                                 { id: 45, name: "DBH | Dompelpomphaakarmbak", personal: 0},
                                 { id: 46, name: "DM Noddhulp | Dienstmotorfiets Noodhulp", personal: 2},
                                 { id: 47, name: "DA Hondengeleider | Dienstauto Hondengeleider", personal: 2},
                                 { id: 48, name: "DB Hondengeleider | Dienstbus Hondengeleider", personal: 2},
                                 { id: 49, name: "PM-OR | Materieelvoertuig - Oppervlakteredding", personal: 9},
                                 { id: 50, name: "TS-OR | Tankautospuit - Oppervlakteredding", personal: 9},
-                                { id: 51, name: "HVH | HulpverleningsHaakarmbak", personal: 0}];
+                                { id: 51, name: "HVH | HulpverleningsHaakarmbak", personal: 0},
+                                { id: 52, name: "RR | Rapid Responder", personal: 1},
+                                { id: 53, name: "AT-C | AT-Commandant", personal: 2},
+                                { id: 54, name: "AT-O | AT-Operator", personal: 4},
+                                { id: 55, name: "AT-M | AT-Materiaalwagen", personal: 2},
+                                { id: 56, name: "DA-VL | Dienstauto Voorlichter", personal: 1},
+                                { id: 57, name: "DA OVDG-RR | Dienstvoertuig Officier van Dienst-Geneeskundig/Rapid Responder", personal: 1}];
 
     let arrFahrzeugDaten = [];
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
@@ -215,6 +235,7 @@ $(function() {
         setHeading = "WacheAnzahl";
         setOwner = "Besitzer";
         setAssemblyArea = "Fahrzeuge am Bereitstellungsraum";
+        AssemblyAreaID = "14";
     } else if(I18n.locale == "en_US"){
         arrFahrzeugDaten = arrFahrzeugDatenEN;
         setPersonnel = "Personnel";
@@ -237,6 +258,7 @@ $(function() {
         setHeading = "StationAmount";
         setOwner = "Owner";
         setAssemblyArea = "Vehicles at the staging area";
+        AssemblyAreaID = "9";
     } else if(I18n.locale == "nl_NL"){
         arrFahrzeugDaten = arrFahrzeugDatenNL;
         setPersonnel = "Personeel";
@@ -259,6 +281,7 @@ $(function() {
         setHeading = "PostAantal";
         setOwner = "Eigenaar";
         setAssemblyArea = "Voertuigen op de verzamelplaats";
+        AssemblyAreaID = "10";
     }
 
     function getSumBereitstellung(){
@@ -299,7 +322,7 @@ $(function() {
             output += "<br>";
         });
 
-        $("h1[building_type='14']").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
+        $("h1[building_type='"+ AssemblyAreaID +"']").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
     }
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
