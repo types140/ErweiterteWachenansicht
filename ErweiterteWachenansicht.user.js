@@ -235,7 +235,6 @@ $(function() {
         setHeading = "WacheAnzahl";
         setOwner = "Besitzer";
         setAssemblyArea = "Fahrzeuge am Bereitstellungsraum";
-        AssemblyAreaID = "14";
     } else if(I18n.locale == "en_US"){
         arrFahrzeugDaten = arrFahrzeugDatenEN;
         setPersonnel = "Personnel";
@@ -258,7 +257,6 @@ $(function() {
         setHeading = "StationAmount";
         setOwner = "Owner";
         setAssemblyArea = "Vehicles at the staging area";
-        AssemblyAreaID = "9";
     } else if(I18n.locale == "nl_NL"){
         arrFahrzeugDaten = arrFahrzeugDatenNL;
         setPersonnel = "Personeel";
@@ -281,7 +279,6 @@ $(function() {
         setHeading = "PostAantal";
         setOwner = "Eigenaar";
         setAssemblyArea = "Voertuigen op de verzamelplaats";
-        AssemblyAreaID = "10";
     }
 
     function getSumBereitstellung(){
@@ -322,7 +319,7 @@ $(function() {
             output += "<br>";
         });
 
-        $("h1[building_type='"+ AssemblyAreaID +"']").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
+        $("h1[building_type='14']").next().after("<dl><dt>" + setAssemblyArea + ":</dt><dd>" + output + "</dd></dl>");
     }
 
     function getPersonalAnzahl(getIgnoriereCheckFMS) {
