@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.6
+// @version      1.6.7
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://leitstellenspiel.de/buildings/*
@@ -107,7 +107,8 @@ $(function() {
                                 { id: 90, name: "HLF 10", personal: 9 },
                                 { id: 91, name: "Rettungshundefahrzeug", personal: 5 },
                                 { id: 92, name: "Anh Hund", personal: 0 },
-                                { id: 93, name: "MTW-OV", personal: 5 }];
+                                { id: 93, name: "MTW-OV", personal: 5 },
+                                { id: 94, name: "DHuFüKw", personal: 2}];
 
     const arrFahrzeugDatenEN = [{ id: 0, name: "Type 1 fire engine", personal: 6},
                                 { id: 1, name: "Type 2 fire engine", personal: 3},
