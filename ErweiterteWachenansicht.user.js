@@ -108,7 +108,10 @@ $(function() {
                                 { id: 91, name: "Rettungshundefahrzeug", personal: 5 },
                                 { id: 92, name: "Anh Hund", personal: 0 },
                                 { id: 93, name: "MTW-OV", personal: 5 },
-                                { id: 94, name: "DHuFüKw", personal: 2}];
+                                { id: 94, name: "DHuFüKw", personal: 2},
+                                { id: 95, name: "Polizeimotorrad", personal: 1},
+                                { id: 96, name: "Außenlastbehälter (allgemein)", personal: 0},
+                                { id: 97, name: "ITW", personal: 3}];
 
     const arrFahrzeugDatenEN = [{ id: 0, name: "Type 1 fire engine", personal: 6},
                                 { id: 1, name: "Type 2 fire engine", personal: 3},
@@ -149,7 +152,24 @@ $(function() {
                                 { id: 36, name: "Air tanker", personal: 5 },
                                 { id: 37, name: "Heavy air tanker", personal: 5 },
                                 { id: 38, name: "Type 4 engine", personal: 5 },
-                                { id: 39, name: "Type 6 engine", personal: 2 }];
+                                { id: 39, name: "Type 6 engine", personal: 2 },
+                                { id: 40, name: "Dozer Trailer", personal: 0 },
+                                { id: 41, name: "Crew cap semi", personal: 3 },
+                                { id: 42, name: "FBI Unit", personal: 4 },
+                                { id: 43, name: "FBI Investigation Wagon", personal: 4 },
+                                { id: 44, name: "FBI Mobile Command Center", personal: 4 },
+                                { id: 45, name: "FBI Bomb Technician Vehicle", personal: 2 },
+                                { id: 46, name: "FBI Surveillance Drone", personal: 1 },
+                                { id: 47, name: "Sheriff Unit", personal: 2 },
+                                { id: 48, name: "EMS Fire Engine/Ambulance", personal: 6 },
+                                { id: 49, name: "Tactical Ambulance", personal: 3 },
+                                { id: 50, name: "Hazmat Ambulance", personal: 3 },
+                                { id: 51, name: "DEA Unit", personal: 4 },
+                                { id: 52, name: "DEA Clan Lab", personal: 2 },
+                                { id: 53, name: "ATF Unit", personal: 4 },
+                                { id: 54, name: "ATF Lab Vehiclee", personal: 2 },
+                                { id: 55, name: "Patrol Boat", personal: 2 },
+                                { id: 56, name: "Warden's Truck", personal: 2 }];
 
     const arrFahrzeugDatenNL = [{ id: 0, name: "SIV | Snel Interventie Voertuig", personal: 2},
                                 { id: 1, name: "TS 8/9 | Tankautospuit (8/9 personen)", personal: 9},
@@ -208,7 +228,14 @@ $(function() {
                                 { id: 54, name: "AT-O | AT-Operator", personal: 4},
                                 { id: 55, name: "AT-M | AT-Materiaalwagen", personal: 2},
                                 { id: 56, name: "DA-VL | Dienstauto Voorlichter", personal: 1},
-                                { id: 57, name: "DA OVDG-RR | Dienstvoertuig Officier van Dienst-Geneeskundig/Rapid Responder", personal: 1}];
+                                { id: 57, name: "DA OVDG-RR | Dienstvoertuig Officier van Dienst-Geneeskundig/Rapid Responder", personal: 1},
+                                { id: 58, name: "DB Arrestantenvervoer", personal: 2},
+                                { id: 59, name: "Noodhulp - Onopvallend", personal: 2},
+                                { id: 60, name: "DB Biketeam", personal: 2},
+                                { id: 61, name: "Slangenhaakarmbak", personal: 0},
+                                { id: 62, name: "TS-HV | Tankautospuit-Hulpverlening", personal: 7},
+                                { id: 63, name: "DM - Rapid Responder", personal: 1},
+                                { id: 64, name: "ME Aanhoudingseenheid", personal: 8}];
 
     let arrFahrzeugDaten = [];
     let setPersonnel = "", setNeeded = "", setExpansion = "", setURL = "", setEdit = "", setAssignPersonnel = "", setCrewMax = "", setCrewActMax = "", setAvailable = "", setPresent = "";
