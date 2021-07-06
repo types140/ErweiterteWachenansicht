@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Erweiterte Wachenansicht
-// @version      1.6.7
+// @version      1.6.8
 // @author       Allure149/Sanni
 // @include      *://www.leitstellenspiel.de/buildings/*
 // @include      *://leitstellenspiel.de/buildings/*
@@ -233,7 +233,7 @@ $(function() {
         setWithoutCar = "ohne Fahrzeug";
         setInSchool = "in Ausbildung";
         setEducation = "Ausbildung";
-        setHeading = "WacheAnzahl";
+        setHeading = "WacheAnzahlLehrgangsfilter";
         setOwner = "Besitzer";
         setAssemblyArea = "Fahrzeuge am Bereitstellungsraum";
     } else if(I18n.locale == "en_US"){
